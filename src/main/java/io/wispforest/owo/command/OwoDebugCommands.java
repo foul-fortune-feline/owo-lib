@@ -7,6 +7,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.wispforest.owo.Owo;
 import io.wispforest.owo.ops.TextOps;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.argument.ItemStackArgumentType;
@@ -15,10 +16,7 @@ import net.minecraft.server.command.LootCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -39,8 +37,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 @ApiStatus.Internal
 public class OwoDebugCommands {
 
-    private static final EnumArgumentType<StandardLevel> LEVEL_ARGUMENT_TYPE =
-            EnumArgumentType.create(StandardLevel.class, "'{}' is not a valid logging level");
+//    private static final EnumArgumentType<StandardLevel> LEVEL_ARGUMENT_TYPE =
+//            EnumArgumentType.create(StandardLevel.class, "'{}' is not a valid logging level");
 
     private static final SuggestionProvider<ServerCommandSource> POI_TYPES =
             (context, builder) -> CommandSource.suggestIdentifiers(Registry.POINT_OF_INTEREST_TYPE.getIds(), builder);
@@ -91,7 +89,7 @@ public class OwoDebugCommands {
                         HitResult target = player.raycast(5, 0, false);
 
                         if (target.getType() != HitResult.Type.BLOCK) {
-                            source.sendError(TextOps.concat(Owo.PREFIX, new LiteralText("You're not looking at a block")));
+                            source.sendError(TextOps.concat(Owo.PREFIX, MutableText.of(new LiteralTextContent("You're not looking at a block"))));
                             return 1;
                         }
 
@@ -135,29 +133,30 @@ public class OwoDebugCommands {
                         return 0;
                     })));
 
-            dispatcher.register(literal("give_loot_container")
-                    .then(argument("item", ItemStackArgumentType.itemStack())
-                            .then(argument("loot_table", IdentifierArgumentType.identifier()).suggests(LootCommand.SUGGESTION_PROVIDER).executes(context -> {
-                                var targetStack = ItemStackArgumentType.getItemStackArgument(context, "item").createStack(1, false);
-                                var table_id = IdentifierArgumentType.getIdentifier(context, "loot_table");
+            // TODO: Fix Debug Command "give_loot_container"
+//            dispatcher.register(literal("give_loot_container")
+//                    .then(argument("item", ItemStackArgumentType.itemStack(new CommandRegistryAccess()))
+//                            .then(argument("loot_table", IdentifierArgumentType.identifier()).suggests(LootCommand.SUGGESTION_PROVIDER).executes(context -> {
+//                                var targetStack = ItemStackArgumentType.getItemStackArgument(context, "item").createStack(1, false);
+//                                var table_id = IdentifierArgumentType.getIdentifier(context, "loot_table");
+//
+//                                targetStack.getOrCreateSubNbt("BlockEntityTag").putString("LootTable", table_id.toString());
+//
+//                                context.getSource().getPlayer().getInventory().offerOrDrop(targetStack);
+//
+//                                return 0;
+//                            }))));
 
-                                targetStack.getOrCreateSubNbt("BlockEntityTag").putString("LootTable", table_id.toString());
-
-                                context.getSource().getPlayer().getInventory().offerOrDrop(targetStack);
-
-                                return 0;
-                            }))));
-
-            dispatcher.register(literal("logger").then(argument("level", LEVEL_ARGUMENT_TYPE).executes(context -> {
-                final var level = LEVEL_ARGUMENT_TYPE.get(context, "level");
-
-                var ctx = (LoggerContext) LogManager.getContext(false);
-                ctx.getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.getLevel(level.name()));
-                ctx.updateLoggers();
-
-                context.getSource().sendFeedback(TextOps.concat(Owo.PREFIX, new LiteralText("Global logging level set to: §9" + level)), false);
-                return 0;
-            })));
+//            dispatcher.register(literal("logger").then(argument("level", LEVEL_ARGUMENT_TYPE).executes(context -> {
+//                final var level = LEVEL_ARGUMENT_TYPE.get(context, "level");
+//
+//                var ctx = (LoggerContext) LogManager.getContext(false);
+//                ctx.getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.getLevel(level.name()));
+//                ctx.updateLoggers();
+//
+//                context.getSource().sendFeedback(TextOps.concat(Owo.PREFIX, MutableText.of(new LiteralTextContent("Global logging level set to: §9" + level))), false);
+//                return 0;
+//            })));
 
             dispatcher.register(literal("query_poi").then(argument("poi_type", IdentifierArgumentType.identifier()).suggests(POI_TYPES)
                     .then(argument("radius", IntegerArgumentType.integer()).executes(context -> {
@@ -197,7 +196,7 @@ public class OwoDebugCommands {
                 HitResult target = player.raycast(5, 0, false);
 
                 if (target.getType() != HitResult.Type.BLOCK) {
-                    source.sendError(TextOps.concat(Owo.PREFIX, new LiteralText("You're not looking at a block")));
+                    source.sendError(TextOps.concat(Owo.PREFIX, MutableText.of(new LiteralTextContent("You're not looking at a block"))));
                     return 1;
                 }
 
@@ -205,7 +204,7 @@ public class OwoDebugCommands {
                 final var blockEntity = player.getWorld().getBlockEntity(pos);
 
                 if (blockEntity == null) {
-                    source.sendError(TextOps.concat(Owo.PREFIX, new LiteralText("No block entity")));
+                    source.sendError(TextOps.concat(Owo.PREFIX, MutableText.of(new LiteralTextContent("No block entity"))));
                     return 1;
                 }
 
@@ -220,7 +219,7 @@ public class OwoDebugCommands {
                     source.sendFeedback(TextOps.concat(Owo.PREFIX, TextOps.withColor("Field value: §" + value, TextOps.color(Formatting.GRAY), KEY_BLUE)), false);
 
                 } catch (Exception e) {
-                    source.sendError(TextOps.concat(Owo.PREFIX, new LiteralText("Could not access field - " + e.getClass().getSimpleName() + ": " + e.getMessage())));
+                    source.sendError(TextOps.concat(Owo.PREFIX, MutableText.of(new LiteralTextContent("Could not access field - " + e.getClass().getSimpleName() + ": " + e.getMessage()))));
                 }
 
                 return 0;

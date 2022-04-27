@@ -36,7 +36,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.TagKey;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -188,7 +189,7 @@ public class Uwu implements ModInitializer {
                                             .executes(context -> {
                                                 GameProfile profile = GameProfileArgumentType.getProfileArgument(context, "player").iterator().next();
                                                 Map<Identifier, AdvancementProgress> map = OfflineAdvancementLookup.get(profile.getId());
-                                                context.getSource().sendFeedback(new LiteralText(map.toString()), false);
+                                                context.getSource().sendFeedback(MutableText.of(new LiteralTextContent(map.toString())), false);
                                                 System.out.println(map);
                                                 return 0;
                                             })))

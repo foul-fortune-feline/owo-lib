@@ -2,6 +2,7 @@ package io.wispforest.owo.util;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.AbstractRandom;
 import net.minecraft.world.World;
 
 import java.util.Random;
@@ -58,7 +59,7 @@ public class VectorRandomUtils {
      */
     public static Vec3d getRandomOffsetSpecific(World world, Vec3d center, double deviationX, double deviationY, double deviationZ) {
 
-        Random r = world.getRandom();
+        AbstractRandom r = world.getRandom();
 
         double x = center.getX() + (r.nextDouble() - 0.5) * deviationX;
         double y = center.getY() + (r.nextDouble() - 0.5) * deviationY;

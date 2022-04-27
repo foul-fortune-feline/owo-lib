@@ -8,7 +8,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
@@ -27,11 +28,11 @@ public class Owo implements ModInitializer {
     public static final Logger LOGGER = LogManager.getLogger("owo");
     private static MinecraftServer SERVER;
 
-    public static final Text PREFIX = new LiteralText("[").formatted(Formatting.GRAY)
+    public static final Text PREFIX = MutableText.of(new LiteralTextContent("[")).formatted(Formatting.GRAY)
             .append(withColor("o", 0x3955e5))
             .append(withColor("ω", 0x13a6f0))
             .append(withColor("o", 0x3955e5))
-            .append(new LiteralText("] ").formatted(Formatting.GRAY));
+            .append(MutableText.of(new LiteralTextContent("] ")).formatted(Formatting.GRAY));
 
     static {
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
