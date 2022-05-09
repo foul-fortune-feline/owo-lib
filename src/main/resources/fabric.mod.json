@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "owo",
-  "version": "${version}",
+  "version": "0.7.0+1.19",
   "name": "oωo",
   "description": "yes its bad i know thanks",
   "authors": [
@@ -34,7 +34,7 @@
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
-    "minecraft": ">=1.18.2"
+    "minecraft": ">=1.19-alpha.22.18.a"
   },
   "custom": {
     "modmenu": {

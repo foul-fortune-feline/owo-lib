@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> The type of object this serializer can handle
  */
-public record PacketBufSerializer<T>(BiConsumer<PacketByteBuf, T> serializer, Function<PacketByteBuf, T> deserializer) {
+public record PacketBufSerializer<T>(PacketByteBuf.class_7462<T> serializer,  PacketByteBuf.class_7461<T> deserializer) {
 
     private static final Map<Class<?>, Supplier<?>> COLLECTION_PROVIDERS = new HashMap<>();
     private static final Map<Class<?>, PacketBufSerializer<?>> SERIALIZERS = new HashMap<>();
@@ -64,12 +64,12 @@ public record PacketBufSerializer<T>(BiConsumer<PacketByteBuf, T> serializer, Fu
      * @param deserializer The deserialization method
      * @param <T>          The type of object to register a serializer for
      */
-    public static <T> void register(Class<T> clazz, BiConsumer<PacketByteBuf, T> serializer, Function<PacketByteBuf, T> deserializer) {
+    public static <T> void register(Class<T> clazz, PacketByteBuf.class_7462<T> serializer, PacketByteBuf.class_7461<T> deserializer) {
         register(clazz, new PacketBufSerializer<>(serializer, deserializer));
     }
 
     @SafeVarargs
-    private static <T> void register(BiConsumer<PacketByteBuf, T> serializer, Function<PacketByteBuf, T> deserializer, Class<T>... classes) {
+    private static <T> void register(PacketByteBuf.class_7462<T> serializer, PacketByteBuf.class_7461<T> deserializer, Class<T>... classes) {
         final var packetSerializer = new PacketBufSerializer<T>(serializer, deserializer);
         for (var clazz : classes) {
             register(clazz, packetSerializer);
@@ -283,7 +283,7 @@ public record PacketBufSerializer<T>(BiConsumer<PacketByteBuf, T> serializer, Fu
 
     @SuppressWarnings("unchecked")
     public static <T, K> PacketBufSerializer<T> createDispatchedSerializer(Function<K, PacketBufSerializer<? extends T>> keyToSerializer, Function<T, K> keyGetter, PacketBufSerializer<K> keySerializer) {
-        return new PacketBufSerializer<>((buf, value) -> {
+        return new PacketBufSerializer<T>((buf, value) -> {
             var key = keyGetter.apply(value);
             var serializer = (PacketBufSerializer<Object>) keyToSerializer.apply(key);
 
@@ -368,9 +368,9 @@ public record PacketBufSerializer<T>(BiConsumer<PacketByteBuf, T> serializer, Fu
         register(PacketByteBuf::writeFloat, PacketByteBuf::readFloat, Float.class, float.class);
         register(PacketByteBuf::writeDouble, PacketByteBuf::readDouble, Double.class, double.class);
 
-        register((BiConsumer<PacketByteBuf, Byte>) PacketByteBuf::writeByte, PacketByteBuf::readByte, Byte.class, byte.class);
-        register((BiConsumer<PacketByteBuf, Short>) PacketByteBuf::writeShort, PacketByteBuf::readShort, Short.class, short.class);
-        register((BiConsumer<PacketByteBuf, Character>) PacketByteBuf::writeChar, PacketByteBuf::readChar, Character.class, char.class);
+        register((PacketByteBuf.class_7462<Byte>) PacketByteBuf::writeByte, PacketByteBuf::readByte, Byte.class, byte.class);
+        register((PacketByteBuf.class_7462<Short>) PacketByteBuf::writeShort, PacketByteBuf::readShort, Short.class, short.class);
+        register((PacketByteBuf.class_7462<Character>) PacketByteBuf::writeChar, PacketByteBuf::readChar, Character.class, char.class);
 
         register(Void.class, (packetByteBuf, unused) -> {}, packetByteBuf -> null);
 
